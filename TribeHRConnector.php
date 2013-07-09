@@ -18,7 +18,7 @@ class TribeHRConnector
    *                          requests you will make through the connector
    * @param string $api_key: The API key belonging to the same TribeHR user as the $username value
    */
-	public function __construct($subdomain, $username, $api_key) {
+	public function __construct($subdomain, $username = null, $api_key = null) {
 		$this->subdomain = $subdomain;
 		$this->username = $username;
 		$this->api_key = $api_key;
