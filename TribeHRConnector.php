@@ -3,6 +3,7 @@
 class TribeHRConnector
 {
 	private $version = '0.2';
+	private $api_version = '0.0.0';
 	private $username;
 	private $api_key;
 	private $subdomain;
@@ -35,6 +36,16 @@ class TribeHRConnector
 	}
 	
   /**
+   * Setter for the $api_version value if you wish to use a version of the API 
+   * other than 0.0.0
+   *
+   * @param string $api_version: The X-API-Version you wish to use.
+   */
+	public function setApiVersion($api_version) {
+		$this->api_version = $api_version;
+	}
+	
+  /**
    * Execute the given request/submission against the given TribeHR endpoint
    *
    * @param uri $uri: the API endpoint path to submit against (eg /users.xml)
@@ -60,11 +71,19 @@ class TribeHRConnector
     curl_setopt($ch, CURLOPT_URL, sprintf('%s://%s.mytribehr.com%s', $this->protocol, $this->subdomain, $uri)); 
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_MAXREDIRS, 2);
-    curl_setopt($ch, CURLOPT_HEADER, 0);                                                                           
-    curl_setopt($ch, CURLOPT_USERPWD, $this->username . ":" . $this->api_key);  
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    
+    // If this is a public call don't use username and api key
+    if (!is_null($this->username) && !is_null($this->api_key)) {
+	    curl_setopt($ch, CURLOPT_USERPWD, $this->username . ":" . $this->api_key);  
+    }
+
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_USERAGENT, sprintf("TribeHR PHP Connector/%s", $this->version));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: text/xml; charset=utf-8',));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+	    'Accept: text/xml; charset=utf-8',
+	    'X-API-Version: '. $this->api_version
+    ));
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
